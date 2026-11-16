@@ -6,16 +6,18 @@
 <title>Voahary Canopy — a concept stay in Madagascar's rainforest</title>
 <meta name="description" content="Voahary Canopy is a concept stay: nine moss-domed treehouse pods strung along a waterfall gorge in Madagascar's eastern rainforest. Designed, not yet built.">
 <style>
-  @font-face{font-family:'Anton';src:url('assets/fonts/anton.woff2') format('woff2');font-weight:400;font-display:swap}
+  @font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/cormorant-var.woff2') format('woff2');font-weight:300 700;font-display:swap}
+  @font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/cormorant-italic.woff2') format('woff2');font-weight:300 700;font-style:italic;font-display:swap}
   @font-face{font-family:'Montserrat';src:url('assets/fonts/montserrat-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
 
   :root{
     --gorge:#0A0C07; --gorge-2:#10130A; --panel:#12160C;
     --emerald:#3B3D26; --ink:#F8FBF4; --body:#E8EFE3;
-    --dim:rgba(232,239,227,.74); --dimmer:rgba(232,239,227,.52);
+    --dim:rgba(232,239,227,.78); --dimmer:rgba(232,239,227,.55);
     --sky:#C9E2E9; --amber:#E9BE6A; --cream:#F5EDD8; --dark-text:#131A0E;
-    --hair:rgba(201,226,233,.14); --hair-soft:rgba(248,251,244,.28);
-    --font-d:'Anton',sans-serif; --font-b:'Montserrat',sans-serif;
+    --hair:rgba(201,226,233,.16); --hair-soft:rgba(248,251,244,.28);
+    --glass:linear-gradient(155deg,rgba(19,23,14,.58),rgba(10,12,7,.44));
+    --serif:'Cormorant Garamond',Georgia,serif; --font-b:'Montserrat',sans-serif;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:auto}
@@ -23,10 +25,18 @@
   body{font-family:var(--font-b);color:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
   img{display:block;max-width:100%}
   a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
   ::selection{background:var(--amber);color:var(--dark-text)}
 
-  /* ================= HERO / FILM ENGINE (mechanics unchanged) ================= */
-  #hero{position:relative;height:600vh;padding:0}   /* scroll length = the journey */
+  /* ================= PRELOADER (video's thin progress bar) ================= */
+  #loader{
+    position:fixed;top:0;left:0;height:2px;width:0;z-index:90;
+    background:linear-gradient(90deg,var(--emerald),var(--amber));
+    transition:width .25s ease,opacity .6s ease;pointer-events:none;
+  }
+
+  /* ================= FILM STAGE (engine mechanics unchanged) ================= */
+  #hero{position:relative;height:1000vh;padding:0}   /* scroll length = film + scenes */
   #stage{
     position:sticky;top:0;width:100%;height:100vh;height:100svh;
     overflow:hidden;background:var(--gorge);container-type:size;
@@ -34,69 +44,210 @@
   #poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   #film{position:absolute;inset:0;width:100%;height:100%}
 
-  .scrim-top{
-    position:absolute;left:0;right:0;top:0;height:29.6cqh;z-index:3;pointer-events:none;
-    background:linear-gradient(to bottom,rgba(10,12,7,.85),rgba(10,12,7,0));
+  /* ================= SCENES (the video's overlay containers) ================= */
+  .scene{position:absolute;inset:0;z-index:4;opacity:0;pointer-events:none;will-change:opacity,transform}
+  .scene .scrim{position:absolute;inset:0;pointer-events:none}
+  .eyebrow{
+    font-weight:600;font-size:12.5px;letter-spacing:.32em;color:var(--amber);
+    text-transform:uppercase;margin:0 0 22px;
+  }
+  .glass{
+    background:var(--glass);border:1px solid var(--hair);
+    backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25);
+  }
+  .gbtn{
+    display:inline-flex;align-items:center;gap:12px;border-radius:999px;
+    padding:15px 26px;cursor:pointer;color:var(--ink);
+    font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:.03em;
+    transition:border-color .3s ease,background .3s ease;white-space:nowrap;
+  }
+  .gbtn:hover{border-color:rgba(233,190,106,.55)}
+  .gbtn .arr{color:var(--amber);font-family:var(--font-b);font-size:15px}
+  .gbtn .play{
+    width:26px;height:26px;flex:none;border:1px solid rgba(233,190,106,.6);border-radius:50%;
+    display:grid;place-items:center;color:var(--amber);font-size:10px;padding-left:2px;
   }
 
-  /* ---- end-state hero UI (spec: HERO-UI-DESIGN.md, desktop table) ---- */
-  .hero-end{position:absolute;inset:0;z-index:4;pointer-events:none}
-  .hero-end [data-t]{opacity:0;will-change:opacity,transform}
-  .scrim-bottom{
-    position:absolute;left:0;right:0;bottom:0;height:26cqh;
-    background:linear-gradient(to top,rgba(10,12,7,.70),rgba(10,12,7,0));
+  /* ---------- S1 · HERO (video's hero pattern, over the film's first frame) ---------- */
+  .s1 .scrim{
+    background:
+      linear-gradient(to top,rgba(10,12,7,.52),rgba(10,12,7,0) 34%),
+      linear-gradient(to bottom,rgba(10,12,7,.40),rgba(10,12,7,0) 30%),
+      linear-gradient(90deg,rgba(10,12,7,.58),rgba(10,12,7,.14) 55%,rgba(10,12,7,0) 78%);
   }
-  .h-eyebrow{
-    position:absolute;left:5cqw;top:29.44cqh;width:36.5cqw;margin:0;
-    font-weight:600;font-size:max(11px,min(.729cqw,1.30cqh));letter-spacing:.286em;
-    color:var(--amber);white-space:nowrap;
+  .s1-left{position:absolute;left:5cqw;top:50%;transform:translateY(-55%);width:46cqw}
+  .s1-eyebrow{
+    font-weight:600;font-size:max(11px,.68cqw);letter-spacing:.34em;color:var(--amber);margin:0 0 2.6cqh;
   }
-  .h-headline{
-    position:absolute;left:5cqw;top:32.22cqh;width:65.1cqw;margin:0;
-    font-family:var(--font-d);font-weight:400;color:var(--ink);
-    font-size:min(7.8125cqw,13.89cqh);line-height:1.02;letter-spacing:.004em;
+  .s1-spaced{
+    font-family:var(--serif);font-weight:500;font-size:max(19px,1.62cqw);
+    letter-spacing:.88em;color:var(--sky);margin:0 0 .4cqh;
   }
-  .h-sub{
-    position:absolute;left:5cqw;top:63.89cqh;width:27.08cqw;margin:0;
-    font-size:max(13.5px,min(.99cqw,1.76cqh));line-height:1.5;color:var(--body);
+  .s1-word{
+    font-family:var(--serif);font-weight:500;color:var(--ink);
+    font-size:min(11.6cqw,20.6cqh);line-height:.98;margin:0;letter-spacing:.005em;
   }
-  .h-cta{
-    position:absolute;left:5cqw;top:72.78cqh;width:13.33cqw;min-width:196px;height:5.19cqh;min-height:46px;
-    display:grid;place-items:center;border-radius:999px;background:var(--cream);color:var(--dark-text);
-    font-weight:600;font-size:max(11.5px,min(.781cqw,1.39cqh));letter-spacing:.133em;white-space:nowrap;
-    pointer-events:none;transition:background .3s ease;
+  .s1-word .first{color:var(--amber)}
+  .s1-tracked{
+    font-weight:500;font-size:max(11px,.7cqw);letter-spacing:.42em;color:var(--body);margin:2.8cqh 0 0;
   }
-  .h-cta:hover{background:var(--amber)}
-  .h-film{
-    position:absolute;left:20cqw;top:74.44cqh;
-    font-weight:500;font-size:max(12.5px,min(.833cqw,1.48cqh));color:var(--ink);
-    pointer-events:none;white-space:nowrap;
+  .s1-state{
+    margin:3.4cqh 0 0;border-left:2px solid var(--amber);padding-left:20px;
+    font-weight:600;font-size:max(12px,.74cqw);letter-spacing:.17em;line-height:2;color:var(--ink);
   }
-  .h-film:hover{color:var(--amber)}
-  .h-hairline{position:absolute;left:5cqw;top:92.41cqh;width:90cqw;height:1px;background:var(--hair-soft)}
-  .h-strip{
-    position:absolute;top:94.26cqh;margin:0;font-weight:500;
-    font-size:max(9.5px,min(.625cqw,1.11cqh));letter-spacing:.208em;color:var(--body);white-space:nowrap;
+  .s1-state em{
+    font-family:var(--serif);font-style:italic;font-weight:600;text-transform:none;
+    font-size:1.55em;letter-spacing:.01em;color:var(--amber);vertical-align:-.08em;
   }
-  .h-strip-l{left:5cqw}
-  .h-strip-r{right:5cqw;text-align:right}
-  #stage.at-rest .h-cta,#stage.at-rest .h-film{pointer-events:auto}
+  .s1-ctas{
+    position:absolute;right:5cqw;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;gap:14px;align-items:stretch;
+  }
+  .s1-bottom{
+    position:absolute;left:5cqw;right:5cqw;bottom:3.2cqh;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+  }
+  .s1-mark{display:flex;align-items:center;gap:12px;font-size:10.5px;font-weight:600;letter-spacing:.26em;color:var(--dimmer)}
+  .s1-chip{
+    display:flex;align-items:center;gap:18px;border-radius:999px;padding:12px 24px;
+    font-size:11.5px;font-weight:600;letter-spacing:.22em;color:var(--ink);
+  }
+  .s1-chip .dot{width:5px;height:5px;border-radius:50%;background:var(--amber)}
+  .s1-chip .sep{width:1px;height:16px;background:var(--hair-soft)}
+  .s1-scroll{display:flex;align-items:center;gap:16px;font-size:10.5px;font-weight:600;letter-spacing:.3em;color:var(--body)}
+  .s1-scroll button{
+    width:46px;height:46px;border-radius:50%;border:1px solid var(--hair-soft);
+    background:rgba(10,12,7,.25);color:var(--ink);cursor:pointer;display:grid;place-items:center;
+    transition:border-color .3s ease;
+  }
+  .s1-scroll button:hover{border-color:var(--amber);color:var(--amber)}
 
-  /* scroll cue (start state) */
-  .cue{
-    position:absolute;left:50%;bottom:3.4cqh;transform:translateX(-50%);z-index:5;
-    text-align:center;pointer-events:none;color:rgba(248,251,244,.78);
-    font-size:10px;font-weight:600;letter-spacing:.34em;text-indent:.34em;
+  /* ---------- S2 · THE STAY (About-hero pattern: centred, over the descent) ---------- */
+  .s2 .scrim{background:radial-gradient(ellipse 72% 62% at 50% 46%,rgba(10,12,7,.58),rgba(10,12,7,0) 72%)}
+  .s2-inner{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;text-align:center;padding:0 6cqw;
   }
-  .cue .cue-line{
-    width:1px;height:44px;margin:10px auto 0;
-    background:linear-gradient(to bottom,rgba(248,251,244,.75),rgba(248,251,244,0));
-    transform-origin:top;
+  .s2-inner h2{
+    font-family:var(--serif);font-weight:500;color:var(--ink);
+    font-size:min(4.55cqw,8.1cqh);line-height:1.05;margin:0 0 2.8cqh;letter-spacing:.004em;
   }
-  @media (prefers-reduced-motion: no-preference){
-    .cue .cue-line{animation:cueDrop 2.2s ease-in-out infinite}
+  .s2-inner .story{font-size:max(14.5px,.86cqw);line-height:1.68;color:var(--body);max-width:60ch;margin:0}
+  .s2-inner .story strong{color:var(--ink);font-weight:600}
+  .credit-panel{
+    margin-top:3.2cqh;max-width:660px;border-radius:18px;padding:18px 26px;text-align:left;
+    font-size:13.5px;line-height:1.65;color:var(--dim);
   }
-  @keyframes cueDrop{0%{transform:scaleY(.25);opacity:.4}55%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:.35}}
+  .credit-panel .cp-label{
+    display:block;font-size:10px;font-weight:600;letter-spacing:.3em;color:var(--amber);margin-bottom:7px;
+  }
+  .credit-panel strong{color:var(--body);font-weight:600}
+
+  /* ---------- S3 · THE VILLAGE (video's showcase section) ---------- */
+  .s3 .scrim{
+    background:
+      linear-gradient(to top,rgba(10,12,7,.46),rgba(10,12,7,0) 40%),
+      linear-gradient(270deg,rgba(10,12,7,.44),rgba(10,12,7,.10) 34%,rgba(10,12,7,0) 55%),
+      linear-gradient(90deg,rgba(10,12,7,.52),rgba(10,12,7,.08) 58%,rgba(10,12,7,0) 80%);
+  }
+  .s3-grid{
+    position:absolute;left:5cqw;right:5cqw;top:14.5cqh;
+    display:grid;grid-template-columns:1.25fr .85fr;gap:6cqw;align-items:start;
+  }
+  .s3-grid h2{
+    font-family:var(--serif);font-weight:500;color:var(--ink);
+    font-size:min(3.95cqw,7cqh);line-height:1.04;margin:0 0 2.4cqh;
+  }
+  .s3-grid .lede{font-size:max(14.5px,.85cqw);line-height:1.66;color:var(--dim);max-width:44ch;margin:0 0 3.4cqh}
+  .s3-ctas{display:flex;align-items:center;gap:26px}
+  .btn-cream{
+    display:inline-flex;align-items:center;gap:14px;border-radius:999px;border:0;cursor:pointer;
+    background:var(--cream);color:var(--dark-text);padding:10px 10px 10px 26px;
+    font-weight:600;font-size:13.5px;letter-spacing:.1em;transition:background .3s ease;
+  }
+  .btn-cream:hover{background:var(--amber)}
+  .btn-cream .circ{
+    width:38px;height:38px;border-radius:50%;background:var(--gorge);color:var(--cream);
+    display:grid;place-items:center;font-size:15px;
+  }
+  .tlink{font-weight:550;font-size:14.5px;color:var(--ink);cursor:pointer}
+  .tlink:hover{color:var(--amber)}
+  .feat{display:flex;gap:18px;padding:2cqh 0;border-top:1px solid var(--hair)}
+  .feat:first-child{border-top:0;padding-top:.4cqh}
+  .feat .fic{
+    width:47px;height:47px;flex:none;border-radius:50%;border:1px solid var(--hair);
+    background:rgba(10,12,7,.45);display:grid;place-items:center;color:var(--amber);
+  }
+  .feat h3{font-family:var(--serif);font-weight:600;font-size:max(19px,1.22cqw);color:var(--ink);margin:2px 0 5px}
+  .feat p{font-size:13.5px;line-height:1.55;color:var(--dim);margin:0}
+  .statbar{
+    position:absolute;left:5cqw;width:77.5cqw;bottom:4.2cqh;border-radius:18px;
+    display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;
+  }
+  .stat{padding:2cqh 1.4cqw}
+  .stat+.stat{border-left:1px solid var(--hair)}
+  .stat .num{font-family:var(--serif);font-weight:600;font-size:min(2.5cqw,4.5cqh);color:var(--ink);line-height:1;font-variant-numeric:lining-nums}
+  .stat .lab{font-size:10px;font-weight:600;letter-spacing:.24em;color:var(--dimmer);margin-top:8px;text-transform:uppercase}
+
+  /* ---------- S4 · THE PODS (video's person + listings section) ---------- */
+  .s4 .scrim{
+    background:
+      linear-gradient(to bottom,rgba(10,12,7,.36),rgba(10,12,7,0) 30%),
+      linear-gradient(to top,rgba(10,12,7,.58),rgba(10,12,7,0) 46%);
+  }
+  .s4-top{
+    position:absolute;left:5cqw;right:5cqw;top:12.8cqh;
+    display:flex;justify-content:space-between;align-items:flex-start;gap:4cqw;
+  }
+  .s4-intro h2{
+    font-family:var(--serif);font-weight:500;color:var(--ink);
+    font-size:min(4.7cqw,8.35cqh);line-height:1.02;margin:0;
+  }
+  .s4-rule{width:64px;height:2px;background:var(--amber);margin:2cqh 0 1.8cqh}
+  .s4-sub{font-family:var(--serif);font-style:italic;font-weight:500;font-size:max(18px,1.25cqw);color:var(--sky);margin:0 0 1.4cqh}
+  .s4-intro .note{font-size:14.5px;line-height:1.62;color:var(--dim);max-width:40ch;margin:0}
+  .s4-circle{position:relative;flex:none;width:min(16.8cqw,29.9cqh);aspect-ratio:1;margin-right:1.5cqw}
+  .s4-circle .ring{
+    width:100%;height:100%;border-radius:50%;overflow:hidden;
+    border:2px solid var(--amber);box-shadow:0 24px 60px rgba(4,6,3,.45);
+  }
+  .s4-circle img{width:100%;height:100%;object-fit:cover}
+  .s4-badge{
+    position:absolute;left:50%;bottom:4.5%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:9px;border-radius:999px;padding:9px 17px;
+    background:rgba(10,12,7,.82);border:1px solid var(--hair);
+    font-size:10px;font-weight:600;letter-spacing:.22em;color:var(--ink);white-space:nowrap;
+  }
+  .s4-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--amber)}
+  .s4-cards{
+    position:absolute;left:5cqw;right:5cqw;bottom:11.2cqh;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1.15cqw;
+  }
+  .pcard{
+    position:relative;border-radius:18px;overflow:hidden;height:33.5cqh;
+    border:1px solid rgba(201,226,233,.13);background:var(--panel);
+  }
+  .pcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .pcard::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(10,12,7,.82) 0%,rgba(10,12,7,.18) 46%,rgba(10,12,7,0) 68%);
+  }
+  .pnum{
+    position:absolute;top:14px;left:14px;z-index:2;width:35px;height:35px;border-radius:50%;
+    background:rgba(10,12,7,.55);border:1px solid var(--hair);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);font-variant-numeric:lining-nums;
+  }
+  .pbody{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px}
+  .pbody h3{font-family:var(--serif);font-weight:600;font-size:max(20px,1.35cqw);color:var(--ink);margin:0 0 3px}
+  .pbody p{font-size:12.5px;color:var(--dim);margin:0}
+  .pgo{
+    margin-top:11px;width:36px;height:36px;border-radius:50%;cursor:pointer;
+    border:1px solid var(--hair-soft);background:rgba(10,12,7,.35);color:var(--amber);
+    display:grid;place-items:center;font-size:12px;transition:border-color .3s ease,background .3s ease;
+  }
+  .pgo:hover{border-color:var(--amber);background:rgba(10,12,7,.6)}
+  .s4-cta{position:absolute;left:50%;bottom:3.6cqh;transform:translateX(-50%)}
 
   /* ---- watermark badge: positioned in FRAME space by JS (cover-fit math) ---- */
   #badge{
@@ -111,292 +262,450 @@
     color:var(--ink);
   }
   #badge svg{width:calc(var(--bw,160px)*.30);height:auto}
-  #badge .b-name{
-    font-weight:600;font-size:calc(var(--bw,160px)*.088);
-    letter-spacing:.34em;text-indent:.34em;line-height:1;color:var(--ink);
-  }
-  #badge .b-sub{
-    font-weight:600;font-size:calc(var(--bw,160px)*.060);
-    letter-spacing:.44em;text-indent:.44em;line-height:1;color:var(--amber);
-  }
+  #badge .b-name{font-weight:600;font-size:calc(var(--bw,160px)*.088);letter-spacing:.34em;text-indent:.34em;line-height:1;color:var(--ink)}
+  #badge .b-sub{font-weight:600;font-size:calc(var(--bw,160px)*.060);letter-spacing:.44em;text-indent:.44em;line-height:1;color:var(--amber)}
 
-  /* ================= HEADER (persistent) ================= */
+  /* ================= HEADER (video's: brand left, hamburger right) ================= */
   header{
     position:fixed;left:0;right:0;top:0;z-index:60;pointer-events:none;
-    display:flex;align-items:flex-start;
-    padding:clamp(16px,3.89vh,42px) clamp(20px,5vw,96px) 20px;
+    display:flex;align-items:flex-start;justify-content:space-between;
+    padding:clamp(18px,3.6vh,38px) clamp(20px,5vw,96px) 18px;
   }
-  header::before{
-    content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .45s ease;
-    background:rgba(10,12,7,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--hair);
-  }
-  header.is-solid::before{opacity:1}
-  .brand{display:flex;align-items:flex-start;gap:16px;pointer-events:auto}
-  .brand svg{flex:none;margin-top:0}
-  .wordmark{
-    font-weight:600;font-size:23px;letter-spacing:.217em;color:var(--ink);
-    margin-top:5px;white-space:nowrap;
-  }
-  nav.site-nav{
-    margin-left:auto;margin-top:10px;display:flex;gap:46px;pointer-events:auto;
-  }
-  nav.site-nav a{
-    font-weight:500;font-size:15px;letter-spacing:.133em;color:rgba(248,251,244,.92);
-    position:relative;padding-bottom:5px;
-  }
-  nav.site-nav a::after{
-    content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
-    background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .35s ease;
-  }
-  nav.site-nav a:hover{color:var(--amber)}
-  nav.site-nav a:hover::after{transform:scaleX(1)}
+  .brand{display:flex;align-items:flex-start;gap:15px;pointer-events:auto;cursor:pointer}
+  .wordmark{font-weight:600;font-size:21px;letter-spacing:.217em;color:var(--ink);margin-top:6px;white-space:nowrap}
   #menuBtn{
-    display:none;margin-left:auto;pointer-events:auto;
-    font-family:var(--font-b);font-weight:600;font-size:13px;letter-spacing:.192em;
-    color:var(--ink);background:none;border:0;cursor:pointer;margin-top:7px;padding:6px 0;
+    pointer-events:auto;background:none;border:0;cursor:pointer;padding:8px 2px;
+    display:flex;flex-direction:column;gap:6.5px;align-items:flex-end;margin-top:4px;
   }
+  #menuBtn span{display:block;height:2px;background:var(--ink);transition:width .3s ease,background .3s ease}
+  #menuBtn span:nth-child(1){width:32px}
+  #menuBtn span:nth-child(2){width:24px}
+  #menuBtn span:nth-child(3){width:28px}
+  #menuBtn:hover span{width:32px;background:var(--amber)}
 
-  /* phone menu overlay */
-  #menuOverlay{
-    position:fixed;inset:0;z-index:70;background:rgba(8,10,6,.97);
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    display:flex;flex-direction:column;justify-content:center;padding:0 32px;
-    opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s;
+  /* ================= MENU (native <dialog>, MWG pattern) ================= */
+  #menuDlg{
+    border:0;padding:0;margin:0;width:100%;max-width:none;height:100%;max-height:none;
+    background:rgba(8,10,6,.9);color:var(--body);
+    backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);
   }
-  #menuOverlay.open{opacity:1;visibility:visible}
-  #menuOverlay a{
-    font-family:var(--font-d);font-size:42px;line-height:1.28;color:var(--ink);
-    border-bottom:1px solid var(--hair);padding:10px 0;
-  }
-  #menuOverlay a:last-of-type{border-bottom:0}
+  #menuDlg::backdrop{background:rgba(4,6,3,.45)}
+  .menu-in{height:100%;display:flex;flex-direction:column;padding:clamp(18px,3.6vh,38px) clamp(20px,5vw,96px) 30px}
+  .menu-top{display:flex;align-items:flex-start;justify-content:space-between}
   #menuClose{
-    position:absolute;top:26px;right:24px;background:none;border:0;cursor:pointer;
-    font-family:var(--font-b);font-weight:600;font-size:13px;letter-spacing:.192em;color:var(--ink);
-    padding:8px 0;
+    background:none;border:0;cursor:pointer;color:var(--ink);
+    font-weight:600;font-size:13px;letter-spacing:.22em;padding:8px 0;
   }
-  #menuOverlay .m-note{margin-top:26px;font-size:11px;letter-spacing:.2em;color:var(--dimmer)}
+  #menuClose:hover{color:var(--amber)}
+  .menu-links{margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+  .menu-links a{
+    display:flex;align-items:baseline;gap:18px;padding:7px 0;color:var(--ink);
+    font-family:var(--serif);font-weight:500;font-size:clamp(34px,4.6vw,58px);line-height:1.16;
+    transition:color .3s ease;
+  }
+  .menu-links a:hover{color:var(--amber)}
+  .menu-links a .mn{font-family:var(--font-b);font-size:11px;font-weight:600;letter-spacing:.26em;color:var(--amber)}
+  .menu-note{text-align:center;font-size:10.5px;font-weight:550;letter-spacing:.24em;color:var(--dimmer);margin:0}
 
-  /* ================= SECTIONS ================= */
+  /* ================= FLOW SECTIONS ================= */
   main{position:relative;background:var(--gorge)}
-  section{padding:clamp(96px,15vh,160px) 0}
+  .fsec{padding:clamp(96px,14vh,150px) 0}
   .wrap{width:min(1240px,90vw);margin-inline:auto}
-  .eyebrow{
-    font-weight:600;font-size:12.5px;letter-spacing:.3em;color:var(--amber);
-    text-transform:uppercase;margin:0 0 22px;
-  }
   .sec-title{
-    font-family:var(--font-d);font-weight:400;color:var(--ink);
-    font-size:clamp(40px,4.8vw,78px);line-height:1.02;margin:0 0 26px;letter-spacing:.004em;
+    font-family:var(--serif);font-weight:600;color:var(--ink);
+    font-size:clamp(38px,4.2vw,66px);line-height:1.04;margin:0 0 24px;
   }
-  .lede{font-size:17px;line-height:1.65;color:var(--dim);max-width:56ch;margin:0}
+  .lede{font-size:16.5px;line-height:1.65;color:var(--dim);max-width:56ch;margin:0}
+  .centre{text-align:center}
+  .centre .eyebrow{margin-bottom:18px}
 
-  /* The Stay */
-  .stay-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,96px);align-items:start}
-  .stay-copy>p:not(.eyebrow){font-size:16.5px;line-height:1.7;color:var(--dim);margin:0 0 20px;max-width:58ch}
-  .stay-copy>p:not(.eyebrow) strong{color:var(--body);font-weight:600}
-  .credit{
-    border-left:2px solid var(--amber);padding-left:18px;margin-top:30px;
-    font-size:14.5px;line-height:1.65;color:var(--dimmer);
+  /* Pillars — the video's About values cards */
+  .pill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:clamp(44px,6vh,60px)}
+  .pill{
+    border-radius:20px;padding:36px 32px 40px;
+    background:linear-gradient(165deg,rgba(27,32,18,.72),rgba(13,16,9,.82));
+    border:1px solid var(--hair);
   }
-  .credit strong{color:var(--body);font-weight:600}
-  .stay-fig{border-radius:20px;overflow:hidden;position:relative}
-  .stay-fig img{width:100%;height:100%;object-fit:cover;transform:scale(1.12)}
-  .stay-fig figcaption{
-    position:absolute;left:0;right:0;bottom:0;padding:38px 20px 14px;
-    font-size:12px;letter-spacing:.06em;color:rgba(248,251,244,.85);
-    background:linear-gradient(to top,rgba(10,12,7,.72),rgba(10,12,7,0));
-  }
-  .tenets{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,56px);
-    margin-top:clamp(64px,9vh,96px);
-  }
-  .tenet{border-top:1px solid var(--hair);padding-top:24px}
-  .tenet .t-num{font-family:var(--font-d);font-size:20px;color:var(--amber);margin-bottom:12px}
-  .tenet h3{font-size:16.5px;font-weight:650;letter-spacing:.05em;color:var(--ink);margin:0 0 10px;text-transform:uppercase}
-  .tenet p{font-size:14.5px;line-height:1.65;color:var(--dim);margin:0}
+  .pill.hot{border-color:rgba(233,190,106,.55);box-shadow:0 18px 50px rgba(233,190,106,.08),inset 0 1px 0 rgba(248,251,244,.08)}
+  .pill .p-eyebrow{font-size:12px;font-weight:600;letter-spacing:.3em;color:var(--amber);margin:0 0 16px}
+  .pill h3{font-family:var(--serif);font-weight:600;font-size:31px;color:var(--ink);margin:0 0 12px}
+  .pill p{font-size:15px;line-height:1.66;color:var(--dim);margin:0}
 
-  /* The Pods */
-  #pods{background:linear-gradient(to bottom,var(--gorge),var(--gorge-2) 22%,var(--gorge-2) 78%,var(--gorge))}
-  .pods-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:clamp(44px,6vh,64px)}
-  .pods-head .sec-title{margin-bottom:0}
-  .pods-note{font-size:14.5px;color:var(--dimmer);max-width:34ch;line-height:1.6;margin:0}
-  .pods-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-  .pod{
-    background:var(--panel);border:1px solid rgba(201,226,233,.09);border-radius:22px;
-    overflow:hidden;transition:transform .5s ease,border-color .5s ease;
-  }
-  .pod:hover{transform:translateY(-6px);border-color:rgba(233,190,106,.35)}
-  .pod figure{margin:0;aspect-ratio:4/5;overflow:hidden;position:relative}
-  .pod figure img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s ease}
-  .pod:hover figure img{transform:scale(1.05)}
-  .chip{
-    position:absolute;top:16px;left:16px;padding:7px 12px;border-radius:999px;
-    background:rgba(10,12,7,.62);border:1px solid rgba(233,190,106,.45);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-    font-size:10px;font-weight:600;letter-spacing:.24em;color:var(--amber);
-  }
-  .pod-body{padding:26px 26px 30px}
-  .pod-body h3{font-family:var(--font-d);font-weight:400;font-size:31px;color:var(--ink);margin:0 0 6px}
-  .pod-tag{font-size:13.5px;font-weight:550;color:var(--amber);margin:0 0 14px}
-  .pod-body>p{font-size:15px;line-height:1.62;color:var(--dim);margin:0}
-  .pod-meta{
-    margin-top:20px;padding-top:16px;border-top:1px solid var(--hair);
-    font-size:11px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
-    display:flex;flex-wrap:wrap;gap:6px 10px;
-  }
-  .pod-meta span+span::before{content:"·";margin-right:10px;color:var(--amber)}
-
-  /* Experiences */
+  /* Experiences — the video's feature-row language as hairline rows */
   .xp-row{
     display:grid;grid-template-columns:96px 1fr 1.15fr;gap:clamp(20px,3.4vw,48px);
     align-items:center;padding:36px 0;border-top:1px solid var(--hair);
   }
   .xp-row:last-child{border-bottom:1px solid var(--hair)}
-  .xp-num{font-family:var(--font-d);font-size:22px;color:var(--amber)}
-  .xp-row h3{font-family:var(--font-d);font-weight:400;font-size:clamp(27px,2.7vw,41px);color:var(--ink);margin:0}
+  .xp-num{font-family:var(--serif);font-weight:600;font-size:27px;color:var(--amber);font-variant-numeric:lining-nums}
+  .xp-row h3{font-family:var(--serif);font-weight:600;font-size:clamp(26px,2.6vw,40px);color:var(--ink);margin:0}
   .xp-row p{font-size:15.5px;line-height:1.62;color:var(--dim);margin:0}
 
-  /* quote band */
-  .band{position:relative;height:64vh;min-height:440px;overflow:hidden}
-  .band img{position:absolute;inset:0;width:100%;height:118%;object-fit:cover;top:-9%}
-  .band::after{content:"";position:absolute;inset:0;background:rgba(10,12,7,.52)}
-  .band-inner{
-    position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;text-align:center;padding:0 6vw;
-  }
-  .band blockquote{
-    font-family:var(--font-d);font-weight:400;color:var(--ink);
-    font-size:clamp(29px,3.5vw,55px);line-height:1.14;margin:0;max-width:940px;
-  }
-  .band .eyebrow{margin-bottom:18px}
-
-  /* Gallery */
-  .gal-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:236px;
-    grid-auto-flow:dense;gap:16px;
-  }
+  /* Gallery — CloudFrame bento, video caption language */
+  .gal-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:236px;grid-auto-flow:dense;gap:16px}
   .gal-grid figure{margin:0;border-radius:16px;overflow:hidden;position:relative;background:var(--panel)}
   .gal-grid img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s ease}
   .gal-grid figure:hover img{transform:scale(1.045)}
   .gal-grid .wide{grid-column:span 2}
   .gal-grid .tall{grid-row:span 2}
   .gal-grid figcaption{
-    position:absolute;left:0;right:0;bottom:0;padding:40px 16px 12px;
-    font-size:12.5px;letter-spacing:.03em;color:rgba(248,251,244,.92);
-    background:linear-gradient(to top,rgba(10,12,7,.78),rgba(10,12,7,0));
+    position:absolute;left:0;right:0;bottom:0;padding:42px 16px 13px;
+    background:linear-gradient(to top,rgba(10,12,7,.8),rgba(10,12,7,0));
   }
-  .gal-grid figcaption small{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:3px}
+  .gal-grid figcaption .gt{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--ink);display:block}
+  .gal-grid figcaption small{display:block;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:3px}
 
-  /* Visit / footer */
-  footer{background:linear-gradient(to bottom,var(--gorge),#070905);overflow:hidden}
-  .visit{padding:clamp(110px,17vh,180px) 0 0;text-align:center}
-  .visit .eyebrow{margin-bottom:20px}
-  .visit h2{
-    font-family:var(--font-d);font-weight:400;color:var(--ink);
-    font-size:clamp(36px,4.4vw,68px);line-height:1.06;margin:0 auto 24px;max-width:900px;
+  /* ================= FOOTER (the video's footer, over the dimmed end frame) ================= */
+  footer{position:relative;overflow:hidden;background:#070905}
+  .foot-bg{position:absolute;inset:0}
+  .foot-bg img{width:100%;height:100%;object-fit:cover}
+  .foot-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,9,5,.9),rgba(7,9,5,.965) 55%)}
+  .foot-in{position:relative;z-index:2;padding:clamp(90px,13vh,140px) 0 0}
+  .news-panel{
+    border-radius:24px;padding:clamp(30px,3.6vw,52px);
+    display:grid;grid-template-columns:1.15fr .9fr 1fr;gap:clamp(28px,3.4vw,52px);align-items:center;
+    background:linear-gradient(160deg,rgba(14,17,10,.88),rgba(9,11,7,.92));
+    border:1px solid var(--hair);
   }
-  .visit .honest{font-size:17.5px;line-height:1.65;color:var(--body);max-width:620px;margin:0 auto 16px}
-  .visit .sub{font-size:15px;line-height:1.65;color:var(--dimmer);max-width:560px;margin:0 auto}
-  .visit .tofilm{
-    display:inline-block;margin-top:36px;font-weight:600;font-size:13px;letter-spacing:.22em;
-    color:var(--amber);border:1px solid rgba(233,190,106,.45);border-radius:999px;padding:14px 26px;
-    transition:background .3s ease,color .3s ease;
+  .news-panel .np-eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.3em;color:var(--amber);margin:0 0 16px}
+  .news-panel h3{
+    font-family:var(--serif);font-weight:500;color:var(--ink);
+    font-size:clamp(30px,2.9vw,44px);line-height:1.1;margin:0;
   }
-  .visit .tofilm:hover{background:var(--amber);color:var(--dark-text)}
-  .giant{
-    font-family:var(--font-d);font-size:18.5vw;line-height:.78;text-align:center;
-    margin:clamp(48px,7vh,84px) 0 -0.145em;letter-spacing:.01em;user-select:none;
-    background:linear-gradient(to bottom,var(--sky) 10%,var(--emerald) 88%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+  .news-panel .np-mid{font-size:15px;line-height:1.66;color:var(--dim);margin:0}
+  .np-actions{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+  .btn-gold{
+    display:inline-flex;align-items:center;justify-content:center;gap:12px;border-radius:999px;
+    background:var(--amber);color:var(--dark-text);padding:16px 26px;cursor:pointer;border:0;
+    font-weight:650;font-size:13.5px;letter-spacing:.12em;transition:background .3s ease;text-align:center;
   }
+  .btn-gold:hover{background:var(--cream)}
+  .btn-ghost{
+    display:inline-flex;align-items:center;justify-content:center;gap:12px;border-radius:999px;
+    border:1px solid var(--hair-soft);color:var(--ink);padding:15px 26px;cursor:pointer;background:rgba(10,12,7,.3);
+    font-weight:600;font-size:13.5px;letter-spacing:.12em;transition:border-color .3s ease;text-align:center;
+  }
+  .btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+  .np-micro{font-size:12px;color:var(--dimmer);margin:4px 0 0;text-align:right}
+  .foot-cols{
+    display:grid;grid-template-columns:1.45fr 1fr 1fr 1.25fr;gap:clamp(30px,3.6vw,54px);
+    padding:clamp(56px,8vh,76px) 0 clamp(48px,7vh,64px);
+  }
+  .fbrand .fb-name{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+  .fbrand .fb-micro{font-size:10px;font-weight:600;letter-spacing:.3em;color:var(--amber);margin:0 0 16px 55px}
+  .fbrand p{font-size:14px;line-height:1.66;color:var(--dim);margin:0 0 22px;max-width:34ch}
+  .fb-pills{display:flex;gap:10px;flex-wrap:wrap}
+  .fb-pills a{
+    border:1px solid var(--hair-soft);border-radius:999px;padding:10px 18px;cursor:pointer;
+    font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--ink);transition:border-color .3s ease,color .3s ease;
+  }
+  .fb-pills a:hover{border-color:var(--amber);color:var(--amber)}
+  .fcol h4{
+    font-size:12px;font-weight:600;letter-spacing:.3em;color:var(--amber);
+    margin:4px 0 20px;padding-bottom:10px;position:relative;
+  }
+  .fcol h4::after{content:"";position:absolute;left:0;bottom:0;width:24px;height:2px;background:var(--amber)}
+  .fcol a.fl{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    font-size:14.5px;color:var(--body);padding:7px 0;cursor:pointer;
+  }
+  .fcol a.fl .arr{color:var(--dimmer);font-size:12px;transition:color .3s ease,transform .3s ease}
+  .fcol a.fl:hover{color:var(--amber)}
+  .fcol a.fl:hover .arr{color:var(--amber);transform:translateX(3px)}
+  .fcol .frow{display:flex;gap:13px;align-items:flex-start;font-size:14.5px;line-height:1.5;color:var(--body);padding:7px 0}
+  .fcol .frow svg{flex:none;margin-top:2px;color:var(--amber)}
   .foot-bar{
     position:relative;border-top:1px solid var(--hair);
-    padding:24px clamp(20px,5vw,96px);
-    display:flex;justify-content:space-between;gap:14px 28px;flex-wrap:wrap;
-    font-size:10.5px;font-weight:550;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);
-    background:#070905;
+    padding:23px clamp(20px,5vw,96px);
+    display:flex;justify-content:space-between;gap:12px 28px;flex-wrap:wrap;
+    font-size:10.5px;font-weight:550;letter-spacing:.17em;text-transform:uppercase;color:var(--dimmer);
   }
 
-  /* ================= PHONE (spec phone table, ≤760px) ================= */
+  /* ================= PHONE (≤760px) — recomposed ================= */
   @media (max-width:760px){
-    header{padding:28px 24px 16px}
+    header{padding:22px 24px 14px}
     .brand{gap:11px}
     .brand svg{width:30px;height:auto}
-    .wordmark{font-size:16px;letter-spacing:.187em;margin-top:5px}
-    nav.site-nav{display:none}
-    #menuBtn{display:block}
-    .h-eyebrow{left:6.15cqw;top:28.2cqh;width:87.7cqw;font-size:10.5px;letter-spacing:.14em}
-    .h-headline{left:6.15cqw;top:31.52cqh;width:87.7cqw;font-size:14.36cqw;line-height:1.06}
-    .h-sub{left:6.15cqw;top:55.69cqh;width:77.4cqw;font-size:max(13.5px,3.85cqw);line-height:1.48}
-    .h-cta{left:6.15cqw;top:67.06cqh;width:87.7cqw;height:6.4cqh;min-height:52px;font-size:13px}
-    .h-film{left:0;right:0;top:76.3cqh;text-align:center;font-size:14px}
-    .h-hairline{left:6.15cqw;top:88.63cqh;width:87.7cqw}
-    .h-strip{left:6.15cqw;right:auto;text-align:left;font-size:10px;letter-spacing:.18em;white-space:normal;width:87.7cqw}
-    .h-strip-l{top:90.5cqh}
-    .h-strip-r{top:93.1cqh}
-    .cue{bottom:12.5cqh}
-    section{padding:84px 0}
-    .stay-grid{grid-template-columns:1fr}
-    .stay-fig{aspect-ratio:4/5}
-    .tenets{grid-template-columns:1fr;gap:0}
-    .tenet{padding:20px 0;border-top:1px solid var(--hair)}
-    .pods-grid{grid-template-columns:1fr}
+    .wordmark{font-size:15.5px;letter-spacing:.18em;margin-top:5px}
+    /* S1 */
+    .s1-left{left:6.15cqw;right:6.15cqw;width:auto;top:auto;bottom:26.5cqh;transform:none}
+    .s1-eyebrow{font-size:10.5px;letter-spacing:.26em;margin-bottom:1.8cqh}
+    .s1-spaced{font-size:16px;letter-spacing:.62em}
+    .s1-word{font-size:23.5cqw}
+    .s1-tracked{font-size:10px;letter-spacing:.3em;margin-top:2cqh}
+    .s1-state{margin-top:2.4cqh;font-size:11px;line-height:1.95;padding-left:14px}
+    .s1-ctas{left:6.15cqw;right:6.15cqw;top:auto;bottom:12.8cqh;transform:none;gap:10px}
+    .s1-ctas .gbtn{justify-content:center;padding:14px 20px;font-size:18px}
+    .s1-bottom{left:6.15cqw;right:6.15cqw;bottom:3.4cqh}
+    .s1-chip{display:none}
+    .s1-scroll .stxt{display:none}
+    .s1-scroll button{width:42px;height:42px}
+    /* S2 */
+    .s2-inner{padding:0 6.15cqw;justify-content:center}
+    .s2-inner h2{font-size:9.4cqw}
+    .s2-inner .story{font-size:14.5px}
+    .credit-panel{padding:15px 18px;font-size:12.5px;margin-top:2.4cqh}
+    /* S3 */
+    .s3-grid{left:6.15cqw;right:6.15cqw;top:10.5cqh;grid-template-columns:1fr;gap:2.6cqh}
+    .s3-grid h2{font-size:10.5cqw}
+    .s3-grid .lede{font-size:14.5px;margin-bottom:2.4cqh}
+    .feat{padding:1.5cqh 0}
+    .feat h3{font-size:20px}
+    .feat p{font-size:12.5px}
+    .statbar{left:6.15cqw;width:87.7cqw;bottom:2.8cqh;grid-template-columns:repeat(2,1fr)}
+    .stat{padding:1.6cqh 4.5cqw}
+    .stat .num{font-size:8.6cqw}
+    .stat:nth-child(3){border-left:0}
+    .stat:nth-child(n+3){border-top:1px solid var(--hair)}
+    /* S4 */
+    .s4-top{left:6.15cqw;right:6.15cqw;top:10.2cqh;gap:4cqw}
+    .s4-intro h2{font-size:11.5cqw}
+    .s4-sub{font-size:17px}
+    .s4-intro .note{font-size:13px;max-width:52cqw}
+    .s4-circle{width:24cqw;margin-right:0}
+    .s4-badge{font-size:7.5px;padding:6px 10px;letter-spacing:.14em;bottom:2%}
+    .s4-cards{
+      left:0;right:0;bottom:10.6cqh;display:flex;gap:12px;
+      overflow-x:auto;padding:4px 6.15cqw 10px;scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    }
+    .s4-cards::-webkit-scrollbar{display:none}
+    .pcard{flex:0 0 74cqw;height:29.5cqh;scroll-snap-align:start}
+    .s4-cta{bottom:3.1cqh}
+    .s4-cta .gbtn{font-size:17px;padding:12px 22px}
+    /* flow */
+    .fsec{padding:84px 0}
+    .pill-grid{grid-template-columns:1fr}
     .xp-row{grid-template-columns:1fr;gap:8px;padding:28px 0}
     .gal-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:168px;gap:10px}
     .gal-grid .wide{grid-column:span 2}
-    .giant{font-size:19.5vw}
+    .news-panel{grid-template-columns:1fr}
+    .np-micro{text-align:left}
+    .foot-cols{grid-template-columns:1fr 1fr}
+    .fbrand{grid-column:1/-1}
     .foot-bar{justify-content:flex-start}
+    .menu-links a{font-size:36px}
+  }
+
+  /* ================= STATIC FALLBACK (reduced motion / no-JS) ================= */
+  .static-ui #hero{height:auto}
+  .static-ui #stage{position:relative;height:auto;overflow:visible;display:flex;flex-direction:column}
+  .static-ui #poster{position:relative;height:58vh;flex:none}
+  .static-ui #film{display:none}
+  .static-ui #badge{display:none}
+  .static-ui #loader{display:none}
+  .static-ui .scene{position:relative;opacity:1 !important;transform:none !important;pointer-events:auto;padding:64px 0}
+  .static-ui .scene .scrim{display:none}
+  .static-ui .s1-left,.static-ui .s2-inner,.static-ui .s3-grid,.static-ui .s4-top{
+    position:relative;inset:auto;transform:none;width:auto;padding:0 6vw;
+  }
+  .static-ui .s1-ctas,.static-ui .s1-bottom,.static-ui .statbar,.static-ui .s4-cards,.static-ui .s4-cta{
+    position:relative;inset:auto;transform:none;margin:28px 6vw 0;width:auto;
+  }
+  .static-ui .s4-cards{display:grid}
+  .static-ui .s2-inner{text-align:left;align-items:flex-start}
+  .static-ui .s2-inner .credit-panel{margin-left:0}
+  @media (max-width:760px){
+    .static-ui .s4-cards{display:flex}
   }
 </style>
+<noscript><style>
+  #hero{height:auto}#stage{position:relative;height:auto;overflow:visible;display:flex;flex-direction:column}
+  #poster{position:relative;height:58vh;flex:none}#film{display:none}#badge{display:none}#loader{display:none}
+  .scene{position:relative;opacity:1;transform:none;pointer-events:auto;padding:64px 0}
+  .scene .scrim{display:none}
+  .s1-left,.s2-inner,.s3-grid,.s4-top{position:relative;inset:auto;transform:none;width:auto;padding:0 6vw}
+  .s1-ctas,.s1-bottom,.statbar,.s4-cards,.s4-cta{position:relative;inset:auto;transform:none;margin:28px 6vw 0;width:auto}
+  .s2-inner{text-align:left;align-items:flex-start}
+</style></noscript>
 </head>
 <body>
 
+<div id="loader" aria-hidden="true"></div>
+
 <header id="siteHeader">
-  <a class="brand" href="#hero" data-scroll aria-label="Voahary Canopy — back to the film">
+  <a class="brand" data-goto="0" aria-label="Voahary Canopy — back to the film's start">
     <svg width="40" height="34" viewBox="0 0 40 34" fill="none" aria-hidden="true">
       <ellipse cx="20" cy="11" rx="19" ry="10.5" fill="#C9E2E9"/>
       <path d="M13.5 19.5 L11.5 32.5 M26.5 19.5 L28.5 32.5" stroke="#C9E2E9" stroke-width="3" stroke-linecap="round"/>
     </svg>
     <span class="wordmark">VOAHARY CANOPY</span>
   </a>
-  <nav class="site-nav" aria-label="Sections">
-    <a href="#stay" data-scroll>THE STAY</a>
-    <a href="#pods" data-scroll>PODS</a>
-    <a href="#experiences" data-scroll>EXPERIENCES</a>
-    <a href="#gallery" data-scroll>GALLERY</a>
-    <a href="#visit" data-scroll>VISIT</a>
-  </nav>
-  <button id="menuBtn" aria-expanded="false" aria-controls="menuOverlay">MENU</button>
+  <button id="menuBtn" aria-label="Open menu" aria-haspopup="dialog">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
-<div id="menuOverlay" role="dialog" aria-modal="true" aria-label="Menu">
-  <button id="menuClose">CLOSE</button>
-  <a href="#stay" data-scroll>THE STAY</a>
-  <a href="#pods" data-scroll>PODS</a>
-  <a href="#experiences" data-scroll>EXPERIENCES</a>
-  <a href="#gallery" data-scroll>GALLERY</a>
-  <a href="#visit" data-scroll>VISIT</a>
-  <p class="m-note">A CONCEPT STAY — DESIGNED, NOT YET BUILT</p>
-</div>
+<dialog id="menuDlg" aria-label="Menu">
+  <div class="menu-in">
+    <div class="menu-top">
+      <a class="brand" data-goto="0" aria-label="Voahary Canopy — back to the film's start">
+        <svg width="36" height="31" viewBox="0 0 40 34" fill="none" aria-hidden="true">
+          <ellipse cx="20" cy="11" rx="19" ry="10.5" fill="#C9E2E9"/>
+          <path d="M13.5 19.5 L11.5 32.5 M26.5 19.5 L28.5 32.5" stroke="#C9E2E9" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span class="wordmark" style="font-size:19px">VOAHARY CANOPY</span>
+      </a>
+      <button id="menuClose" aria-label="Close menu">CLOSE ✕</button>
+    </div>
+    <nav class="menu-links" aria-label="Sections">
+      <a data-goto="0.30"><span class="mn">01</span>The Stay</a>
+      <a data-goto="0.575"><span class="mn">02</span>The Village</a>
+      <a data-goto="0.86"><span class="mn">03</span>The Pods</a>
+      <a data-scroll href="#pillars"><span class="mn">04</span>Pillars</a>
+      <a data-scroll href="#experiences"><span class="mn">05</span>Experiences</a>
+      <a data-scroll href="#gallery"><span class="mn">06</span>Gallery</a>
+      <a data-scroll href="#visit"><span class="mn">07</span>Visit</a>
+    </nav>
+    <p class="menu-note">A CONCEPT STAY — DESIGNED, NOT YET BUILT</p>
+  </div>
+</dialog>
 
-<!-- ================= FILM HERO ================= -->
+<!-- ================= FILM STAGE + SCENES ================= -->
 <section id="hero" aria-label="Arrival film — scroll to fly the gorge">
   <div id="stage">
     <img id="poster" src="poster.jpg" alt="The Crown Pod terrace above the gorge at golden hour — concept render" fetchpriority="high" width="1280" height="720">
     <canvas id="film" width="1280" height="720" role="img" aria-label="Scroll film: a flight over a rainforest gorge, along the canopy walkway, arriving at a treehouse terrace"></canvas>
-    <div class="scrim-top"></div>
 
-    <div class="hero-end" aria-hidden="false">
-      <div class="scrim-bottom" data-t="0.845"></div>
-      <p class="h-eyebrow" data-t="0.855">MADAGASCAR · EASTERN RAINFOREST</p>
-      <h1 class="h-headline" data-t="0.865">YOU ARRIVE<br>ALONG THE CANOPY</h1>
-      <p class="h-sub" data-t="0.885">Nine pods, one gorge, and a waterfall for a neighbour — a concept stay in Madagascar's eastern rainforest.</p>
-      <a class="h-cta" data-t="0.900" href="#pods" data-scroll>EXPLORE THE PODS</a>
-      <a class="h-film" data-t="0.910" href="#hero" data-scroll>Watch the film ↓</a>
-      <div class="h-hairline" data-t="0.920"></div>
-      <p class="h-strip h-strip-l" data-t="0.930">A CONCEPT STAY — DESIGNED, NOT YET BUILT</p>
-      <p class="h-strip h-strip-r" data-t="0.930">MADAGASCAR · RAINFOREST CANOPY</p>
+    <!-- S1 · HERO -->
+    <div class="scene s1" data-scene="s1">
+      <div class="scrim"></div>
+      <div class="s1-left">
+        <p class="s1-eyebrow">A CONCEPT STAY · MADAGASCAR</p>
+        <p class="s1-spaced">ARRIVE</p>
+        <h1 class="s1-word"><span class="first">C</span>anopy</h1>
+        <p class="s1-tracked">NINE PODS · ONE GORGE · ONE WATERFALL</p>
+        <p class="s1-state">YOU DON'T CHECK IN AT A DESK —<br>YOU ARRIVE ALONG THE <em>canopy</em>.</p>
+      </div>
+      <div class="s1-ctas">
+        <a class="gbtn glass" data-goto="0.86">Explore the Pods <span class="arr">→</span></a>
+        <a class="gbtn glass" data-goto="0"><span class="play">▶</span>Watch the Film</a>
+      </div>
+      <div class="s1-bottom">
+        <div class="s1-mark">
+          <svg width="24" height="21" viewBox="0 0 40 34" fill="none" aria-hidden="true">
+            <ellipse cx="20" cy="11" rx="19" ry="10.5" fill="#C9E2E9"/>
+            <path d="M13.5 19.5 L11.5 32.5 M26.5 19.5 L28.5 32.5" stroke="#C9E2E9" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <span>DESIGNED, NOT YET BUILT</span>
+        </div>
+        <div class="s1-chip glass"><span>NINE PODS</span><span class="sep"></span><span>ONE GORGE</span><span class="dot"></span><span>ONE WATERFALL</span></div>
+        <div class="s1-scroll">
+          <span class="stxt">SCROLL TO EXPLORE</span>
+          <button id="cueBtn" aria-label="Scroll on to the next scene">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8 L12 16 L20 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 · THE STAY -->
+    <div class="scene s2" data-scene="s2">
+      <div class="scrim"></div>
+      <div class="s2-inner">
+        <p class="eyebrow">The Stay</p>
+        <h2>Grown around the trees,<br>not over them.</h2>
+        <p class="story">Voahary Canopy is a village of <strong>nine moss-domed pods</strong> strung along a waterfall gorge in Madagascar's eastern rainforest — a stay imagined as part of the forest's own architecture. There is no lobby, no desk, no corridor: the walkway is the arrival, the gorge is the view from every room, and the waterfall is the nearest neighbour.</p>
+        <div class="credit-panel glass">
+          <span class="cp-label">THE WORLD</span>
+          <strong>Madagascar Canopy Cascades</strong> — an unbuilt architectural concept by <strong>Ferial Gharegozlou &amp; Reihan Rahimi Ajdadi</strong> (2023). Every image on this page is a render of that concept — drawn, not photographed. We think it deserves to exist.
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 · THE VILLAGE -->
+    <div class="scene s3" data-scene="s3">
+      <div class="scrim"></div>
+      <div class="s3-grid">
+        <div>
+          <p class="eyebrow">The Village</p>
+          <h2>Nine pods, one gorge.</h2>
+          <p class="lede">Curved walkways run from pod to pod at canopy height; below them, the gorge falls away to a dark pool. Every room looks at the same waterfall — and no two rooms look at it the same way.</p>
+          <div class="s3-ctas">
+            <button class="btn-cream" data-goto="0.86">MEET THE PODS <span class="circ">→</span></button>
+            <a class="tlink" data-goto="0.30">The Stay ↑</a>
+          </div>
+        </div>
+        <div>
+          <div class="feat">
+            <span class="fic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 11 C7 5, 17 5, 21 11 C17 9.6, 7 9.6, 3 11 Z"/><path d="M12 9.8 V21 M12 15 C10 13.4, 8.4 12.8, 6.5 12.6 M12 17.5 C14 15.9, 15.6 15.3, 17.5 15.1"/></svg></span>
+            <div><h3>Living Roofs</h3><p>Moss domes that insulate the pods, breathe with the canopy, and hand the rain back to the forest.</p></div>
+          </div>
+          <div class="feat">
+            <span class="fic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20 C4 12, 8 5, 20 4 C19 16, 12 20, 4 20 Z"/><path d="M4 20 C7 14, 11 9, 17 6"/></svg></span>
+            <div><h3>Woven Craft</h3><p>Bamboo, rattan and carved wood — Malagasy craft traditions carried into every wall, railing and door.</p></div>
+          </div>
+          <div class="feat">
+            <span class="fic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M7 3 C7 9, 10 11, 10 15 a2 2 0 1 0 4 0 C14 11, 17 9, 17 3"/><path d="M4 21 H20"/></svg></span>
+            <div><h3>The Falls Below</h3><p>A dark pool at the foot of the waterfall, down the long stair — cold, shaded at noon, worth the climb back.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="statbar glass" role="list" aria-label="The village in numbers">
+        <div class="stat" role="listitem"><div class="num">9</div><div class="lab">Pods in the village</div></div>
+        <div class="stat" role="listitem"><div class="num">3</div><div class="lab">The film passes</div></div>
+        <div class="stat" role="listitem"><div class="num">1</div><div class="lab">Waterfall below</div></div>
+        <div class="stat" role="listitem"><div class="num">0</div><div class="lab">Check-in desks</div></div>
+      </div>
+    </div>
+
+    <!-- S4 · THE PODS -->
+    <div class="scene s4" data-scene="s4">
+      <div class="scrim"></div>
+      <div class="s4-top">
+        <div class="s4-intro">
+          <p class="eyebrow">The Pods</p>
+          <h2>Three of the nine</h2>
+          <div class="s4-rule"></div>
+          <p class="s4-sub">The pods the film passes.</p>
+          <p class="note">Nine pods step down the gorge. These are the three the film flies past — every one a concept, labelled as such.</p>
+        </div>
+        <div class="s4-circle" aria-hidden="true">
+          <div class="ring"><img src="assets/img/film-end.jpg" alt="" width="1280" height="720" loading="lazy"></div>
+          <span class="s4-badge"><span class="dot"></span>THE FILM ENDS HERE</span>
+        </div>
+      </div>
+      <div class="s4-cards">
+        <article class="pcard">
+          <img src="assets/img/pod-gorge.webp" alt="Concept render: plunge-pool terraces above the waterfall" width="800" height="1000" loading="lazy">
+          <span class="pnum">01</span>
+          <div class="pbody">
+            <h3>Gorge Pod</h3>
+            <p>Lowest — at the gorge's lip</p>
+            <button class="pgo" data-goto="0.30" aria-label="See the Gorge Pod in the film">▶</button>
+          </div>
+        </article>
+        <article class="pcard">
+          <img src="assets/img/pod-canopy.webp" alt="Concept render: a pod interior opening onto the walkway" width="800" height="1000" loading="lazy">
+          <span class="pnum">02</span>
+          <div class="pbody">
+            <h3>Canopy Pod</h3>
+            <p>Walkway level — the arrival</p>
+            <button class="pgo" data-goto="0.575" aria-label="See the Canopy Pod in the film">▶</button>
+          </div>
+        </article>
+        <article class="pcard">
+          <img src="assets/img/pod-crown.webp" alt="Concept render: the Crown Pod's round day-bed chamber" width="800" height="1000" loading="lazy">
+          <span class="pnum">03</span>
+          <div class="pbody">
+            <h3>Crown Pod</h3>
+            <p>Highest — the sunset terrace</p>
+            <button class="pgo" data-goto="0.97" aria-label="See the Crown Pod in the film">▶</button>
+          </div>
+        </article>
+        <article class="pcard">
+          <img src="assets/img/stay.webp" alt="Concept render: the pod village cascading down the gorge slope" width="840" height="1050" loading="lazy">
+          <span class="pnum">04</span>
+          <div class="pbody">
+            <h3>The Village</h3>
+            <p>Nine pods — one gorge</p>
+            <button class="pgo" data-goto="0.24" aria-label="See the village in the film">▶</button>
+          </div>
+        </article>
+      </div>
+      <div class="s4-cta">
+        <a class="gbtn glass" data-scroll href="#gallery">See the Gallery <span class="arr">↓</span></a>
+      </div>
     </div>
 
     <div id="badge" aria-hidden="true">
@@ -407,202 +716,170 @@
       <span class="b-name">VOAHARY</span>
       <span class="b-sub">CANOPY</span>
     </div>
-
-    <div class="cue" id="scrollCue">SCROLL<span class="cue-line"></span></div>
   </div>
 </section>
 
+
 <main>
-  <!-- ================= THE STAY ================= -->
-  <section id="stay">
+  <!-- PILLARS -->
+  <section class="fsec" id="pillars">
     <div class="wrap">
-      <div class="stay-grid">
-        <div class="stay-copy">
-          <p class="eyebrow" data-reveal>The Stay</p>
-          <h2 class="sec-title" data-reveal>Grown around the<br>trees, not over them.</h2>
-          <p data-reveal>Voahary Canopy is a village of <strong>nine moss-domed pods</strong> strung along a waterfall gorge in Madagascar's eastern rainforest — a stay imagined as part of the forest's own architecture. Curved walkways run from pod to pod at canopy height; below them, the gorge falls away to a dark pool.</p>
-          <p data-reveal>There is no lobby, no desk, no corridor. The walkway is the arrival, the gorge is the view from every room, and the waterfall is the nearest neighbour.</p>
-          <div class="credit" data-reveal>
-            <strong>An honest note on what you're looking at.</strong> Voahary is a design study built inside the world of <strong>Madagascar Canopy Cascades</strong>, an unbuilt architectural concept by <strong>Ferial Gharegozlou &amp; Reihan Rahimi Ajdadi</strong> (2023). Every image on this page is a render from that concept — drawn, not photographed. We think it deserves to exist.
-          </div>
-        </div>
-        <figure class="stay-fig" data-reveal style="margin:0">
-          <img src="assets/img/stay.webp" alt="Concept render: the pod village cascading down the gorge slope" width="840" height="1050" loading="lazy" data-plx>
-          <figcaption>The village over the gorge — concept render</figcaption>
-        </figure>
+      <div class="centre" data-reveal>
+        <p class="eyebrow">The Pillars</p>
+        <h2 class="sec-title">Pillars of the concept</h2>
       </div>
-
-      <div class="tenets">
-        <div class="tenet" data-reveal>
-          <div class="t-num">01</div>
-          <h3>Integration</h3>
-          <p>Pods rest on branching stilts that mimic the trees they stand among. Nothing is cleared, nothing is flattened — the forest was here first.</p>
+      <div class="pill-grid">
+        <div class="pill" data-reveal>
+          <p class="p-eyebrow">01 / INTEGRATION</p>
+          <h3>The forest was here first</h3>
+          <p>Pod platforms are tuned to the trees they stand among, and the architecture follows the slope — the canopy keeps its shape, and the village borrows it.</p>
         </div>
-        <div class="tenet" data-reveal>
-          <div class="t-num">02</div>
-          <h3>Sustainability</h3>
-          <p>Living moss roofs insulate the pods, breathe with the canopy, and hand the rain back to the forest that caught it.</p>
+        <div class="pill hot" data-reveal>
+          <p class="p-eyebrow">02 / SUSTAINABILITY</p>
+          <h3>Roofs that breathe</h3>
+          <p>Moss roofs insulate and slow the rain; open walls and woven screens move the air. The concept is drawn to sit lightly — low footprint, local material, no clearing.</p>
         </div>
-        <div class="tenet" data-reveal>
-          <div class="t-num">03</div>
-          <h3>Craft</h3>
-          <p>Woven bamboo, carved wood and rattan — Malagasy craft traditions carried into every wall, railing and door.</p>
+        <div class="pill" data-reveal>
+          <p class="p-eyebrow">03 / CRAFT</p>
+          <h3>Woven by hand</h3>
+          <p>Bamboo lattice, rattan weave, carved door panels and branch-stilt frames — the pods are a showcase of Malagasy making, inside and out.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= THE PODS ================= -->
-  <section id="pods">
+  <!-- EXPERIENCES -->
+  <section class="fsec" id="experiences" style="padding-top:0">
     <div class="wrap">
-      <div class="pods-head">
-        <div>
-          <p class="eyebrow" data-reveal>The Pods</p>
-          <h2 class="sec-title" data-reveal>Three of the nine</h2>
-        </div>
-        <p class="pods-note" data-reveal>Nine pods step down the gorge. These are the three the film passes — every one a concept, labelled as such.</p>
+      <div data-reveal>
+        <p class="eyebrow">Experiences</p>
+        <h2 class="sec-title">Days, as imagined</h2>
+        <p class="lede">No itinerary exists — but if the pods were real, this is what a day would hold.</p>
       </div>
-      <div class="pods-grid">
-        <article class="pod" data-reveal>
-          <figure>
-            <img src="assets/img/pod-gorge.webp" alt="Concept render: plunge-pool terraces above the waterfall" width="800" height="1000" loading="lazy">
-            <span class="chip">CONCEPT</span>
-          </figure>
-          <div class="pod-body">
-            <h3>Gorge Pod</h3>
-            <p class="pod-tag">The lowest pod, at the gorge's lip.</p>
-            <p>Fall asleep to the waterfall. The Gorge Pod hangs closest to the pool, its terraces level with the top of the falls and the gorge dropping away below.</p>
-            <div class="pod-meta"><span>Lowest</span><span>Falls-facing</span><span>Pool below</span></div>
-          </div>
-        </article>
-        <article class="pod" data-reveal>
-          <figure>
-            <img src="assets/img/pod-canopy.webp" alt="Concept render: a pod interior opening onto the walkway" width="800" height="1000" loading="lazy">
-            <span class="chip">CONCEPT</span>
-          </figure>
-          <div class="pod-body">
-            <h3>Canopy Pod</h3>
-            <p class="pod-tag">The arrival pod, at walkway level.</p>
-            <p>The walkway delivers you to its door — the first room of the village, wrapped in mid-canopy green on every side, with the gorge humming below.</p>
-            <div class="pod-meta"><span>Mid-canopy</span><span>Walkway level</span><span>The arrival</span></div>
-          </div>
-        </article>
-        <article class="pod" data-reveal>
-          <figure>
-            <img src="assets/img/pod-crown.webp" alt="Concept render: the Crown Pod's round day-bed chamber" width="800" height="1000" loading="lazy">
-            <span class="chip">CONCEPT</span>
-          </figure>
-          <div class="pod-body">
-            <h3>Crown Pod</h3>
-            <p class="pod-tag">The highest pod — the terrace from the film.</p>
-            <p>Nine pods up, the Crown Pod's terrace looks over the whole cascade of moss roofs to the gorge. The film ends here. The evening begins here.</p>
-            <div class="pod-meta"><span>Highest</span><span>Village view</span><span>Sunset terrace</span></div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= EXPERIENCES ================= -->
-  <section id="experiences">
-    <div class="wrap">
-      <p class="eyebrow" data-reveal>Experiences</p>
-      <h2 class="sec-title" data-reveal>Days, as imagined</h2>
-      <div>
+      <div style="margin-top:52px">
         <div class="xp-row" data-reveal>
-          <div class="xp-num">01</div>
+          <span class="xp-num">01</span>
           <h3>The canopy walk</h3>
-          <p>Out at first light, along the walkways between the pods — the forest wakes up one layer at a time, and the gorge is still holding its mist.</p>
+          <p>Dawn on the walkway, mist still in the gorge. Lemurs in the high branches, hornbills crossing the falls, coffee carried out to the rail.</p>
         </div>
         <div class="xp-row" data-reveal>
-          <div class="xp-num">02</div>
+          <span class="xp-num">02</span>
           <h3>The gorge pool</h3>
-          <p>Down the long stair to the pool at the foot of the falls. Cold, dark, shaded at noon — and worth every step back up.</p>
+          <p>Down the long stair to the dark pool at the waterfall's foot — cold water, fern shade, and nowhere else to be until lunch.</p>
         </div>
         <div class="xp-row" data-reveal>
-          <div class="xp-num">03</div>
-          <h3>Dawn mist</h3>
-          <p>Before the sun clears the ridge, the gorge fills with mist and the whole village floats — the terrace, a coffee, and nowhere to be.</p>
+          <span class="xp-num">03</span>
+          <h3>The falls at noon</h3>
+          <p>The gorge is a natural amphitheatre: spray on the terraces, rainbows in the fall line, the whole village quiet in the heat.</p>
         </div>
         <div class="xp-row" data-reveal>
-          <div class="xp-num">04</div>
+          <span class="xp-num">04</span>
           <h3>Night canopy</h3>
-          <p>After dark the walkways run on lamp-glow, the interiors turn amber, and the forest turns its volume all the way up.</p>
+          <p>Lamps lit along the walkway, frogs in the dark below, and the moss roofs ticking softly as they cool. The forest does the night shift.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= QUOTE BAND ================= -->
-  <div class="band" aria-label="The arrival, in one line">
-    <img src="assets/img/film-mid.jpg" alt="The canopy walkway, from the film" width="1280" height="720" loading="lazy" data-plx>
-    <div class="band-inner">
-      <p class="eyebrow" data-reveal>The Arrival</p>
-      <blockquote data-reveal>You don't check in at a desk.<br>You arrive along the canopy.</blockquote>
-    </div>
-  </div>
-
-  <!-- ================= GALLERY ================= -->
-  <section id="gallery">
+  <!-- GALLERY -->
+  <section class="fsec" id="gallery" style="padding-top:0">
     <div class="wrap">
-      <p class="eyebrow" data-reveal>Gallery</p>
-      <h2 class="sec-title" data-reveal>Renders &amp; film frames</h2>
-      <p class="lede" data-reveal style="margin-bottom:44px">Nothing here is a photograph. The renders are the designers' concept art; the film frames are stills from the scroll film that opens this page.</p>
-      <div class="gal-grid">
-        <figure class="wide" data-reveal>
-          <img src="assets/img/film-start.jpg" alt="Film frame: the gorge and the village from above" width="1280" height="720" loading="lazy">
-          <figcaption><small>Film frame</small>The descent begins</figcaption>
-        </figure>
-        <figure class="tall" data-reveal>
-          <img src="assets/img/terrace.webp" alt="Concept render: dining on a terrace under a pod" width="800" height="1000" loading="lazy">
-          <figcaption><small>Concept render</small>Dining under the pod</figcaption>
-        </figure>
-        <figure data-reveal>
-          <img src="assets/img/falls-room.webp" alt="Concept render: an interior open to a falling stream" width="800" height="1000" loading="lazy">
-          <figcaption><small>Concept render</small>The falls room</figcaption>
-        </figure>
-        <figure data-reveal>
-          <img src="assets/img/bath.webp" alt="Concept render: a bath with the forest for a wall" width="800" height="1000" loading="lazy">
-          <figcaption><small>Concept render</small>A bathroom with the forest for a wall</figcaption>
-        </figure>
-        <figure class="wide" data-reveal>
-          <img src="assets/img/film-end.jpg" alt="Film frame: the Crown Pod terrace at rest" width="1280" height="720" loading="lazy">
-          <figcaption><small>Film frame</small>The Crown terrace — where the film lands</figcaption>
-        </figure>
-        <figure data-reveal>
-          <img src="assets/img/stay.webp" alt="Concept render: the village over the gorge" width="840" height="1050" loading="lazy">
-          <figcaption><small>Concept render</small>The village over the gorge</figcaption>
-        </figure>
-        <figure class="wide" data-reveal>
-          <img src="assets/img/film-mid.jpg" alt="Film frame: the walkway at the seam of the film" width="1280" height="720" loading="lazy">
-          <figcaption><small>Film frame</small>The walkway — the film's middle</figcaption>
-        </figure>
+      <div data-reveal>
+        <p class="eyebrow">Gallery</p>
+        <h2 class="sec-title">The concept, framed</h2>
+        <p class="lede">Nothing here is a photograph. Every frame is a render of the concept — or a still from this site's own film.</p>
+      </div>
+      <div class="gal-grid" style="margin-top:52px">
+        <figure class="wide tall" data-reveal><img src="assets/img/stay.webp" alt="Concept render: the pod village cascading down the gorge slope" width="840" height="1050" loading="lazy"><figcaption><small>Concept render</small><span class="gt">The village, from across the gorge</span></figcaption></figure>
+        <figure data-reveal><img src="assets/img/film-start.jpg" alt="Film frame: aerial view over the gorge" width="1280" height="720" loading="lazy"><figcaption><small>Film frame</small><span class="gt">The approach</span></figcaption></figure>
+        <figure data-reveal><img src="assets/img/falls-room.webp" alt="Concept render: a pod room above the waterfall" width="840" height="1050" loading="lazy"><figcaption><small>Concept render</small><span class="gt">A room above the falls</span></figcaption></figure>
+        <figure class="wide" data-reveal><img src="assets/img/terrace.webp" alt="Concept render: terraces and the plunge pool at golden hour" width="840" height="472" loading="lazy"><figcaption><small>Concept render</small><span class="gt">Terraces at golden hour</span></figcaption></figure>
+        <figure data-reveal><img src="assets/img/film-mid.jpg" alt="Film frame: gliding along the canopy walkway" width="1280" height="720" loading="lazy"><figcaption><small>Film frame</small><span class="gt">The walkway</span></figcaption></figure>
+        <figure data-reveal><img src="assets/img/bath.webp" alt="Concept render: a stone bath in a garden bathroom" width="840" height="1050" loading="lazy"><figcaption><small>Concept render</small><span class="gt">The garden bath</span></figcaption></figure>
+        <figure class="wide" data-reveal><img src="assets/img/film-end.jpg" alt="Film frame: the Crown Pod terrace at the end of the film" width="1280" height="720" loading="lazy"><figcaption><small>Film frame</small><span class="gt">Where the film lands</span></figcaption></figure>
       </div>
     </div>
   </section>
 </main>
 
-<!-- ================= VISIT / FOOTER ================= -->
+<!-- ================= FOOTER / VISIT ================= -->
 <footer id="visit">
-  <div class="visit wrap">
-    <p class="eyebrow" data-reveal>Visit</p>
-    <h2 data-reveal>A concept stay — designed, not yet built.</h2>
-    <p class="honest" data-reveal>There is no booking, because there is — yet — no hotel.</p>
-    <p class="sub" data-reveal>Voahary Canopy is a design study. If it is ever built, it will be built slowly, in Madagascar's eastern rainforest, and with the forest's permission.</p>
-    <a class="tofilm" href="#hero" data-scroll data-reveal>WATCH THE FILM AGAIN ↑</a>
-    <div class="giant" aria-hidden="true">VOAHARY</div>
-  </div>
-  <div class="foot-bar">
-    <span>© 2026 Voahary Canopy — a concept</span>
-    <span>World: Madagascar Canopy Cascades by Ferial Gharegozlou &amp; Reihan Rahimi Ajdadi</span>
-    <span>Not a real hotel</span>
+  <div class="foot-bg" aria-hidden="true"><img src="assets/img/film-end.jpg" alt="" width="1280" height="720" loading="lazy"></div>
+  <div class="foot-in">
+    <div class="wrap">
+      <div class="news-panel" data-reveal>
+        <div>
+          <p class="np-eyebrow">— FOLLOW THE CONCEPT</p>
+          <h3>A village in the trees, imagined in full.</h3>
+        </div>
+        <p class="np-mid">Voahary Canopy is a design study built inside the world of Madagascar Canopy Cascades. If it is ever built, it will be built slowly — and with the forest's permission.</p>
+        <div>
+          <div class="np-actions">
+            <button class="btn-gold" data-goto="0">WATCH THE FILM AGAIN ↑</button>
+            <a class="btn-ghost" data-goto="0.86">MEET THE PODS →</a>
+          </div>
+          <p class="np-micro">No mailing list — there is, yet, no hotel.</p>
+        </div>
+      </div>
+
+      <div class="foot-cols">
+        <div class="fbrand">
+          <div class="fb-name">
+            <svg width="42" height="36" viewBox="0 0 40 34" fill="none" aria-hidden="true">
+              <ellipse cx="20" cy="11" rx="19" ry="10.5" fill="#C9E2E9"/>
+              <path d="M13.5 19.5 L11.5 32.5 M26.5 19.5 L28.5 32.5" stroke="#C9E2E9" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <span style="font-weight:600;font-size:19px;letter-spacing:.2em;color:var(--ink)">VOAHARY CANOPY</span>
+          </div>
+          <p class="fb-micro">A CONCEPT STAY</p>
+          <p>Nine moss-domed pods strung along a waterfall gorge in Madagascar's eastern rainforest — designed, not yet built.</p>
+          <div class="fb-pills">
+            <a data-goto="0">THE FILM ↑</a>
+            <a data-scroll href="#gallery">THE GALLERY ↓</a>
+          </div>
+        </div>
+        <nav class="fcol" aria-label="Explore">
+          <h4>EXPLORE</h4>
+          <a class="fl" data-goto="0.30">The Stay <span class="arr">→</span></a>
+          <a class="fl" data-goto="0.575">The Village <span class="arr">→</span></a>
+          <a class="fl" data-goto="0.86">The Pods <span class="arr">→</span></a>
+          <a class="fl" data-scroll href="#pillars">Pillars <span class="arr">→</span></a>
+        </nav>
+        <nav class="fcol" aria-label="About">
+          <h4>ABOUT</h4>
+          <a class="fl" data-scroll href="#experiences">Experiences <span class="arr">→</span></a>
+          <a class="fl" data-scroll href="#gallery">Gallery <span class="arr">→</span></a>
+          <a class="fl" data-goto="0">The Film <span class="arr">→</span></a>
+          <a class="fl" data-scroll href="#visit">Visit <span class="arr">→</span></a>
+        </nav>
+        <div class="fcol">
+          <h4>VISIT</h4>
+          <div class="frow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21 C12 21, 5 14.5, 5 9.5 a7 7 0 1 1 14 0 C19 14.5, 12 21, 12 21 Z"/><circle cx="12" cy="9.5" r="2.6"/></svg>
+            <span>Madagascar · Eastern rainforest</span>
+          </div>
+          <div class="frow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15.5 14"/></svg>
+            <span>No booking — yet</span>
+          </div>
+          <div class="frow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20 L6 14 L16 4 L20 8 L10 18 Z"/><path d="M14 6 L18 10"/></svg>
+            <span>A design study · 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span>© 2026 Voahary Canopy — a concept</span>
+      <span>World: Madagascar Canopy Cascades by Ferial Gharegozlou &amp; Reihan Rahimi Ajdadi</span>
+      <span>Not a real hotel</span>
+    </div>
   </div>
 </footer>
 
+<script src="assets/vendor/lenis.min.js"></script>
 <script src="assets/vendor/gsap.min.js"></script>
 <script src="assets/vendor/ScrollTrigger.min.js"></script>
-<script src="assets/vendor/lenis.min.js"></script>
-
 <script>
 /* ============ SCROLL FILM ENGINE — verified bare build, carried over ============
    Mechanics unchanged: progressive preload (ends first, stride passes),
@@ -741,188 +1018,169 @@
   requestAnimationFrame(tick);
 })();
 </script>
-
 <script>
-/* ============ UI LAYER — hero UI, badge, header, menu, motion ============ */
-(function () {
+(function(){
   "use strict";
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var stage = document.getElementById("stage");
-  var hero = document.getElementById("hero");
-  var header = document.getElementById("siteHeader");
-  var badge = document.getElementById("badge");
-  var cue = document.getElementById("scrollCue");
+  var heroEl = document.getElementById("hero");
+  var loader = document.getElementById("loader");
 
-  /* ---------- watermark badge: frame-space placement (cover-fit math) ----------
-     The film frame is drawn cover-fit, centred — the same transform the engine
-     uses. The badge is centred on frame point (0.895, 0.840) at 0.105 x 0.140
-     of the drawn frame, so it sits on the Flow sparkle at any viewport aspect.
-     Badge frame footprint: centre (0.895, 0.842), size 0.105 x 0.148 of the frame.
-     Where the cover crop pushes that frame region off-screen (portrait phone),
-     the badge goes with it — the sparkle is cropped out of the picture too. */
-  var FRAME_W = 1280, FRAME_H = 720;
-  var badgeState = { visible: false, cx: 0, cy: 0, bw: 0, bh: 0, dW: 0, dH: 0, ox: 0, oy: 0 };
-  function layoutBadge() {
-    var cw = stage.clientWidth, ch = stage.clientHeight;
-    if (!cw || !ch) return;
-    var s = Math.max(cw / FRAME_W, ch / FRAME_H);
-    var dW = FRAME_W * s, dH = FRAME_H * s;
-    var ox = (cw - dW) / 2, oy = (ch - dH) / 2;
-    var bw = 0.105 * dW, bh = 0.148 * dH;
-    var cx = ox + 0.895 * dW, cy = oy + 0.842 * dH;
-    var visible = cx > -20 && cx < cw + 20 && cy > -20 && cy < ch + 20;
-    badgeState = { visible: visible, cx: cx, cy: cy, bw: bw, bh: bh, dW: dW, dH: dH, ox: ox, oy: oy };
-    badge.style.width = bw + "px";
-    badge.style.height = bh + "px";
-    badge.style.left = (cx - bw / 2) + "px";
-    badge.style.top = (cy - bh / 2) + "px";
-    badge.style.setProperty("--bw", bw + "px");
-    badge.style.opacity = visible ? "1" : "0";
-    /* Wide-aspect guard: when the cover crop is wider than 16:9, the frame —
-       and the badge riding it — extends lower in stage space than it does at
-       the design aspect, into the bottom strip's band. The badge keeps the
-       sparkle covered (non-negotiable); instead the strip's right text is
-       re-anchored to end 18px left of the badge, so the two never collide.
-       At 16:9 and narrower nothing moves — the spec layout is untouched. */
-    var stripR = document.querySelector(".h-strip-r");
-    if (stripR) {
-      var stripTop = 0.9426 * ch;
-      if (visible && cw > 760 && cy + bh / 2 > stripTop - 4) {
-        stripR.style.right = (cw - (cx - bw / 2) + 18) + "px";
-      } else {
-        stripR.style.right = "";
-      }
-    }
-  }
-  window.__badgeInfo = function () {
-    var r = badge.getBoundingClientRect();
-    // the sparkle's measured extent, mapped to screen space for QA containment checks
-    var star = {
-      x0: badgeState.ox + 0.866 * badgeState.dW, x1: badgeState.ox + 0.920 * badgeState.dW,
-      y0: badgeState.oy + 0.795 * badgeState.dH, y1: badgeState.oy + 0.894 * badgeState.dH
-    };
-    return { badgeRect: { x: r.x, y: r.y, w: r.width, h: r.height },
-             starRectStage: star, visible: badgeState.visible,
-             stage: { w: stage.clientWidth, h: stage.clientHeight } };
-  };
-  layoutBadge();
-  var rzT;
-  window.addEventListener("resize", function () {
-    clearTimeout(rzT); rzT = setTimeout(layoutBadge, 120);
-  });
-  window.addEventListener("orientationchange", function () { setTimeout(layoutBadge, 250); });
-
-  /* ---------- hero end-state reveal, driven by the engine's master progress ---------- */
-  var endKids = Array.prototype.slice.call(document.querySelectorAll(".hero-end [data-t]"));
-  endKids.forEach(function (el) {
-    el._t0 = parseFloat(el.getAttribute("data-t"));
-    el._last = -1;
-  });
-  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-  function applyEndState(p) {
-    endKids.forEach(function (el) {
-      var t = clamp01((p - el._t0) / 0.09);
-      var e = 1 - Math.pow(1 - t, 2);
-      if (Math.abs(e - el._last) < 0.003) return;
-      el._last = e;
-      el.style.opacity = e.toFixed(3);
-      if (!el.classList.contains("scrim-bottom")) {
-        el.style.transform = "translateY(" + ((1 - e) * 26).toFixed(1) + "px)";
-      }
-    });
-    var cueO = 1 - clamp01(p / 0.10);
-    cue.style.opacity = cueO.toFixed(3);
-    cue.style.visibility = cueO <= 0.01 ? "hidden" : "visible";
-    stage.classList.toggle("at-rest", p > 0.995);
-  }
-
-  if (reduced) {
-    // Poster = end frame, so the end state is simply present; no cue, no loop.
-    endKids.forEach(function (el) { el.style.opacity = "1"; el.style.transform = "none"; });
-    cue.style.display = "none";
-    stage.classList.add("at-rest");
-  } else {
-    (function uiLoop() {
-      applyEndState(window.__progress || 0);
-      var solidAt = hero.offsetHeight - window.innerHeight + 40;
-      header.classList.toggle("is-solid", (window.scrollY || 0) > solidAt);
-      requestAnimationFrame(uiLoop);
-    })();
-  }
-  if (reduced) {
-    header.classList.toggle("is-solid", false);
-    window.addEventListener("scroll", function () {
-      var solidAt = hero.offsetHeight - window.innerHeight + 40;
-      header.classList.toggle("is-solid", (window.scrollY || 0) > solidAt);
-    }, { passive: true });
-  }
-
-  /* ---------- smooth scroll (Lenis) + GSAP reveals ---------- */
+  /* ---------- Lenis (v1 wiring, unchanged) ---------- */
   var lenis = null;
-  var hasGsap = typeof window.gsap !== "undefined";
-  if (hasGsap && typeof window.ScrollTrigger !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
+  if(!reduced && typeof Lenis !== "undefined"){
+    lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 1 });
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
   }
-  if (!reduced && typeof window.Lenis !== "undefined") {
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-    if (hasGsap && typeof window.ScrollTrigger !== "undefined") {
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
-      gsap.ticker.lagSmoothing(0);
-    } else {
-      (function raf(time) { lenis.raf(time); requestAnimationFrame(raf); })(performance.now());
-    }
+  function scrollToY(y, smooth){
+    if(lenis){ lenis.scrollTo(y, { duration: smooth === false ? 0 : 1.5 }); }
+    else{ window.scrollTo({ top: y, behavior: smooth === false ? "auto" : "smooth" }); }
   }
 
-  // anchor navigation through Lenis when present
-  document.querySelectorAll("[data-scroll]").forEach(function (a) {
-    a.addEventListener("click", function (ev) {
-      var id = a.getAttribute("href");
-      if (!id || id.charAt(0) !== "#") return;
-      var target = document.querySelector(id);
-      if (!target) return;
-      ev.preventDefault();
-      closeMenu();
-      if (lenis) lenis.scrollTo(target, { duration: 1.5 });
-      else target.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+  /* ---------- scene navigation ---------- */
+  function gotoProgress(p){
+    var top = heroEl.offsetTop;
+    var range = heroEl.offsetHeight - window.innerHeight;
+    scrollToY(top + p * range, true);
+  }
+  function anchorTo(sel){
+    var el = document.querySelector(sel);
+    if(el) scrollToY(el.getBoundingClientRect().top + window.scrollY - 8, true);
+  }
+  document.querySelectorAll("[data-goto]").forEach(function(el){
+    el.addEventListener("click", function(e){
+      e.preventDefault();
+      var p = parseFloat(el.getAttribute("data-goto"));
+      if(menuDlg.open) menuDlg.close();
+      gotoProgress(isNaN(p) ? 0 : p);
     });
   });
-
-  if (!reduced && hasGsap && typeof window.ScrollTrigger !== "undefined") {
-    gsap.utils.toArray("[data-reveal]").forEach(function (el) {
-      gsap.from(el, {
-        y: 38, opacity: 0, duration: 1.05, ease: "power3.out",
-        scrollTrigger: { trigger: el, start: "top 87%" }
-      });
+  document.querySelectorAll("[data-scroll]").forEach(function(el){
+    el.addEventListener("click", function(e){
+      var href = el.getAttribute("href");
+      if(href && href.charAt(0) === "#"){ e.preventDefault(); if(menuDlg.open) menuDlg.close(); anchorTo(href); }
     });
-    gsap.utils.toArray("[data-plx]").forEach(function (img) {
-      var host = img.closest("figure") || img.closest(".band") || img;
-      gsap.fromTo(img, { yPercent: -5, scale: 1.14 }, {
-        yPercent: 5, scale: 1.14, ease: "none",
-        scrollTrigger: { trigger: host, start: "top bottom", end: "bottom top", scrub: true }
-      });
-    });
-  }
+  });
+  var cueBtn = document.getElementById("cueBtn");
+  if(cueBtn) cueBtn.addEventListener("click", function(){ scrollToY(window.scrollY + window.innerHeight * 0.9, true); });
 
-  /* ---------- phone menu ---------- */
-  var overlay = document.getElementById("menuOverlay");
+  /* ---------- menu dialog (native <dialog>, MWG) ---------- */
+  var menuDlg = document.getElementById("menuDlg");
   var menuBtn = document.getElementById("menuBtn");
   var menuClose = document.getElementById("menuClose");
-  function openMenu() {
-    overlay.classList.add("open");
-    menuBtn.setAttribute("aria-expanded", "true");
-    menuClose.focus();
-    if (lenis) lenis.stop();
+  if(menuDlg && typeof menuDlg.showModal === "function"){
+    menuBtn.addEventListener("click", function(){ menuDlg.showModal(); });
+    menuClose.addEventListener("click", function(){ menuDlg.close(); });
+    menuDlg.addEventListener("click", function(e){
+      var r = menuDlg.getBoundingClientRect();
+      if(e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) menuDlg.close();
+    });
+    menuDlg.addEventListener("open", function(){ if(lenis) lenis.stop(); });
+    menuDlg.addEventListener("close", function(){ if(lenis) lenis.start(); });
   }
-  function closeMenu() {
-    if (!overlay.classList.contains("open")) return;
-    overlay.classList.remove("open");
-    menuBtn.setAttribute("aria-expanded", "false");
-    if (lenis) lenis.start();
+
+  /* ---------- reduced motion / static stacking ---------- */
+  if(reduced){
+    document.documentElement.classList.add("static-ui");
+    if(loader) loader.style.display = "none";
   }
-  menuBtn.addEventListener("click", openMenu);
-  menuClose.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
+
+  /* ---------- badge geometry (carried over from v1, unchanged math) ---------- */
+  var stage = document.getElementById("stage");
+  var badge = document.getElementById("badge");
+  var FW = 1280, FH = 720;
+  var STAR = { cx: 0.895, cy: 0.842, w: 0.105, h: 0.148 };
+  var badgeState = { visible: false, rect: null };
+  function layoutBadge(){
+    if(!stage || !badge) return;
+    var r = stage.getBoundingClientRect();
+    var scale = Math.max(r.width / FW, r.height / FH);
+    var dw = FW * scale, dh = FH * scale;
+    var ox = (r.width - dw) / 2, oy = (r.height - dh) / 2;
+    var bw = STAR.w * dw, bh = STAR.h * dh;
+    var bx = ox + STAR.cx * dw - bw / 2;
+    var by = oy + STAR.cy * dh - bh / 2;
+    badge.style.width = bw + "px";
+    badge.style.height = bh + "px";
+    badge.style.transform = "translate(" + bx + "px," + by + "px)";
+    badge.style.setProperty("--bw", bw + "px");
+    var onScreen = bx > -bw * 0.25 && bx < r.width - bw * 0.35 && by > 0 && by < r.height;
+    badgeState.visible = onScreen;
+    badgeState.rect = { x: bx, y: by, w: bw, h: bh, stageW: r.width, stageH: r.height };
+  }
+  window.__badgeInfo = function(){ return badgeState; };
+  if(badge && !reduced){
+    layoutBadge();
+    window.addEventListener("resize", layoutBadge);
+  }
+
+  /* ---------- scene windows (the video's overlay crossfades) ---------- */
+  var SCENES = [
+    { name: "s1", a: -1,   b: 0,    c: 0.09, d: 0.16 },
+    { name: "s2", a: 0.20, b: 0.27, c: 0.37, d: 0.44 },
+    { name: "s3", a: 0.46, b: 0.53, c: 0.63, d: 0.70 },
+    { name: "s4", a: 0.72, b: 0.80, c: null, d: null }
+  ];
+  var sceneEls = {};
+  SCENES.forEach(function(s){ sceneEls[s.name] = document.querySelector('[data-scene="' + s.name + '"]'); });
+  function winOp(p, s){
+    if(p <= s.a) return 0;
+    if(p < s.b) return (p - s.a) / (s.b - s.a);
+    if(s.c === null || p <= s.c) return 1;
+    if(p < s.d) return 1 - (p - s.c) / (s.d - s.c);
+    return 0;
+  }
+  function applyScenes(p){
+    SCENES.forEach(function(s){
+      var el = sceneEls[s.name];
+      if(!el) return;
+      var o = winOp(p, s);
+      el.style.opacity = o.toFixed(3);
+      el.style.transform = "translateY(" + ((1 - o) * 22).toFixed(1) + "px)";
+      el.style.pointerEvents = o > 0.55 ? "auto" : "none";
+    });
+    if(badge && badgeState.visible){
+      var bf = 1 - (p <= 0.70 ? 0 : p >= 0.79 ? 1 : (p - 0.70) / 0.09);
+      badge.style.opacity = bf.toFixed(3);
+    } else if(badge){
+      badge.style.opacity = "0";
+    }
+    if(loader && window.__engine){
+      var pc = window.__engine.loadedCount / 200;
+      if(pc >= 1){
+        if(loader.style.opacity !== "0"){ loader.style.width = "100%"; loader.style.opacity = "0"; }
+      } else {
+        loader.style.width = (pc * 100).toFixed(1) + "%";
+      }
+    }
+  }
+  window.__applyScenes = applyScenes;
+
+  /* ---------- one rAF driving scenes off the engine's master progress ---------- */
+  if(!reduced){
+    (function loop(){
+      var p = (typeof window.__progress === "number") ? window.__progress : 0;
+      applyScenes(p);
+      requestAnimationFrame(loop);
+    })();
+  } else {
+    SCENES.forEach(function(s){
+      var el = sceneEls[s.name];
+      if(el){ el.style.opacity = "1"; el.style.pointerEvents = "auto"; }
+    });
+  }
+
+  /* ---------- flow-section reveals (v1 pattern) ---------- */
+  if(!reduced && typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined"){
+    gsap.registerPlugin(ScrollTrigger);
+    if(lenis){ lenis.on("scroll", ScrollTrigger.update); }
+    document.querySelectorAll("[data-reveal]").forEach(function(el){
+      gsap.fromTo(el, { y: 44, opacity: 0 }, {
+        y: 0, opacity: 1, duration: 1.05, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 86%" }
+      });
+    });
+  }
 })();
 </script>
 </body>
